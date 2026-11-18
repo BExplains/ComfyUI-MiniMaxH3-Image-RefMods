@@ -42,6 +42,20 @@ This is reference encoding, not LoRA training. It does not modify model weights 
 
 Requires current ComfyUI with native H3 Image support, the **H3 Image VAE**, and [ComfyUI-MiniMaxH3Mod](https://github.com/Luisacaotica/ComfyUI-MiniMaxH3Mod).
 
+### Install from the Comfy Registry
+
+Find **H3 Image RefMods (BExplains)** in ComfyUI-Manager, or install with Comfy CLI:
+
+```bash
+comfy node install bexplains-h3-image-refmods
+```
+
+[Registry listing](https://registry.comfy.org/publishers/bexplains/nodes/bexplains-h3-image-refmods). Newly uploaded versions become installable after registry processing finishes.
+
+Install **ComfyUI-MiniMaxH3Mod** separately; this extension does not bundle or automatically install that custom-node dependency. Its Python dependency, `safetensors`, is declared in the package metadata.
+
+### Install from source
+
 From your ComfyUI installation directory:
 
 ```bash
@@ -187,6 +201,8 @@ This is unpooled reference encoding. It does not optimize a compressed grid or s
 Container compatibility is different from VAE latent-space compatibility. A loader accepting a file does not establish that another model can interpret its tensors correctly.
 
 The creator discovers the upstream class through `MiniMaxH3RefModsLoader`. Changes to that dependency's internal exports may require an extension update.
+
+The development installation reports ComfyUI **0.45.6**, frontend **1.58.5**, and Python **3.13.12**. Both extension nodes are registered in that running installation. These are observed development versions, not a claim that older versions are incompatible.
 
 ## Resolution and performance
 

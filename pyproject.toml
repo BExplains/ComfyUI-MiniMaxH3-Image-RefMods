@@ -1,6 +1,6 @@
 [project]
 name = "bexplains-h3-image-refmods"
-version = "1.0.0"
+version = "1.0.1"
 description = "Create reusable MiniMax H3 Image RefMod bundles from up to 15 image references using the H3 Image VAE. Requires ComfyUI-MiniMaxH3Mod for RefMod creation and loading."
 readme = "README.md"
 license = { file = "LICENSE" }
