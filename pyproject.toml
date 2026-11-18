@@ -1,0 +1,17 @@
+[project]
+name = "bexplains-h3-image-refmods"
+version = "1.0.0"
+description = "Create reusable MiniMax H3 Image RefMod bundles from up to 15 image references using the H3 Image VAE. Requires ComfyUI-MiniMaxH3Mod for RefMod creation and loading."
+readme = "README.md"
+license = { file = "LICENSE" }
+requires-python = ">=3.10"
+dependencies = ["safetensors"]
+classifiers = ["Operating System :: OS Independent"]
+
+[project.urls]
+Repository = "https://github.com/BExplains/ComfyUI-MiniMaxH3-Image-RefMods"
+"Bug Tracker" = "https://github.com/BExplains/ComfyUI-MiniMaxH3-Image-RefMods/issues"
+
+[tool.comfy]
+PublisherId = "bexplains"
+DisplayName = "H3 Image RefMods (BExplains)"

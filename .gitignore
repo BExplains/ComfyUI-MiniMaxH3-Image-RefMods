@@ -1,0 +1,7 @@
+__pycache__/
+.ruff_cache/
+*.py[cod]
+.venv/
+node.zip
+.env
+.env.*

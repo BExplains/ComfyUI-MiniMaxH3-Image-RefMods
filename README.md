@@ -1,4 +1,4 @@
-# H3 Image RefMods — BExplains
+# MiniMax H3 Image RefMods 
 
 **Package multiple image references into one reusable RefMod for MiniMax H3 Image.**
 
@@ -14,11 +14,10 @@ Inspired by **[ComfyUI-MiniMaxH3Mod](https://github.com/Luisacaotica/ComfyUI-Min
 - [Requirements and installation](#requirements-and-installation)
 - [Quick start](#quick-start)
 - [Node reference](#node-reference)
-- [Tested prompts](#tested-prompts)
+- [Prompting](#prompting)
 - [How it works](#how-it-works)
 - [Compatibility](#compatibility)
 - [Resolution and performance](#resolution-and-performance)
-- [Validation](#validation)
 - [Troubleshooting](#troubleshooting)
 - [FAQ](#faq)
 - [Reporting problems](#reporting-problems)
@@ -48,7 +47,7 @@ From your ComfyUI installation directory:
 ```bash
 cd custom_nodes
 git clone https://github.com/Luisacaotica/ComfyUI-MiniMaxH3Mod.git
-git clone <IMAGE_REFMOD_REPOSITORY_URL> BExplains_H3_Image_References
+git clone https://github.com/BExplains/ComfyUI-MiniMaxH3-Image-RefMods.git
 ```
 
 Skip the first clone if you already have ComfyUI-MiniMaxH3Mod installed. Follow its [dependency installation instructions](https://github.com/Luisacaotica/ComfyUI-MiniMaxH3Mod#install) if this is a new installation.
@@ -56,8 +55,6 @@ Skip the first clone if you already have ComfyUI-MiniMaxH3Mod installed. Follow 
 Restart ComfyUI and refresh the browser. Find **Create H3 Image RefMod (BExplains)** under **BExplains / MiniMax H3**.
 
 Use the **image VAE** in the creator. No video checkpoint, video VAE, or audio model is needed.
-
-<!-- Before publication: replace IMAGE_REFMOD_REPOSITORY_URL with this repository's actual GitHub clone URL. -->
 
 ## Quick start
 
@@ -127,35 +124,23 @@ This node preserves the text embedding and existing metadata, appending image re
 
 The original RefMod extension is required by the **creator** and the normal Load/Apply workflow. The inline node itself uses native conditioning and does not import that extension at execution time.
 
-## Tested prompts
+## Prompting
 
-These prompts were used in the reported character tests. Keep the prompt and sampling settings identical when comparing direct references with a saved pack.
-
-### Police uniform
+Describe the subject, the desired appearance, and the scene. When several references depict the same character, you can make that relationship explicit:
 
 ```text
 subject_definitions:
-<Subject 1> is one woman represented across all supplied references. The different views and outfits depict the same person. She has shoulder-length wavy dark brown hair and wears the navy police uniform shown in the references.
+<Subject 1> is the same person across the reference images.
 
 description:
 <Subject 1> walking cautiously down an alley, looking around as if searching for clues.
 ```
 
-### Summer outfit, same pack
+Use your own reference images when creating the pack. This example requires no downloadable character asset. If the pack includes different outfits, add a description of the outfit you want to the subject definition.
 
-```text
-subject_definitions:
-<Subject 1> is one woman represented across all supplied references. The different views and outfits depict the same person. She has shoulder-length wavy dark brown hair and wears a summer outfit shown in the references.
+The creator does not insert subject definitions, rewrite prompts, assign subject IDs, or select outfits automatically. Ordinary Apply injects visual latents into diffusion conditioning; it does not send the source pictures to Qwen.
 
-description:
-<Subject 1> walking cautiously down an alley, looking around as if searching for clues.
-```
-
-Only the outfit phrase changes. The references stay in the same packaged asset.
-
-The creator does not insert these definitions, rewrite the prompt, assign subject IDs, or select outfits automatically. Ordinary Apply injects visual latents into diffusion conditioning; it does not send the source pictures to Qwen.
-
-For multiple character packs, define the characters clearly and test the association. This creator does not implement automatic pack-to-`<Subject n>` binding. Reliable multi-character generation has not been validated here.
+For multiple character packs, define the characters clearly and test the association. This creator does not implement automatic pack-to-`<Subject n>` binding.
 
 ## How it works
 
@@ -188,10 +173,10 @@ This is unpooled reference encoding. It does not optimize a compressed grid or s
 
 | Scenario                                    | Status                                                            |
 | ------------------------------------------- | ----------------------------------------------------------------- |
-| H3 Image VAE creation                       | Implemented and exercised in the reported generation tests.       |
+| H3 Image VAE creation                       | Supported.                                                        |
 | Normal Apply with creator output            | Supported through upstream `H3_REF_MODS` objects.                 |
 | Normal Load of a saved pack                 | Uses the upstream version-5 bundle format.                        |
-| Several outfits in one character pack       | Demonstrated with police and summer prompts.                      |
+| Several outfits in one character pack       | Supported; describe the desired outfit in the prompt.             |
 | Different dimensions across inputs          | Supported.                                                        |
 | IMAGE batches                               | Each member is encoded separately; total maximum remains 15.      |
 | Conversion of existing video-VAE packs      | Not implemented; recreate from source images using the image VAE. |
@@ -209,7 +194,7 @@ The creator discovers the upstream class through `MiniMaxH3RefModsLoader`. Chang
 
 Reference preprocessing follows the installed ComfyUI implementation. This creator has no reference-resolution slider. Generation resolution controls the output, not the encoding of these source images.
 
-Upsizing an existing source does not recover missing detail. Badges, lettering, jewelry, and other small features can vary. The reported tests measure principal subject count and outfit selection, not exact reproduction of every emblem.
+Upsizing an existing source does not recover missing detail. Badges, lettering, jewelry, and other small features can vary. Reference conditioning does not guarantee exact reproduction of every small feature.
 
 ### Fifteen images includes batch members
 
@@ -229,21 +214,6 @@ The first registered `refmods` directory is used, including roots configured thr
 
 Keep original source images if you may need to recreate a pack. The saved file contains latents and metadata, not copies of the original PNG/JPEG files.
 
-## Validation
-
-Initial reported generation results used one character pack containing different views and outfits:
-
-| Test                            | Observed result                                                                 |
-| ------------------------------- | ------------------------------------------------------------------------------- |
-| Police-uniform prompt           | 5 of 5 shown seeds produced one principal woman in the requested uniform.       |
-| Summer-outfit prompt, same pack | 3 of 3 shown seeds produced one principal woman in the requested summer outfit. |
-
-These results demonstrate repeatability within the tested workflow and outfit selection from one asset. They are not a general success-rate estimate across all characters and settings.
-
-Development checks with simulated components covered schema, ordering, batch handling, metadata preservation, bundle structure, filename validation, and atomic replacement. They complement the real generation tests rather than measuring model quality themselves.
-
-Earlier experiments produced duplicated women, mixed outfits, and character-sheet layouts. The working creator uses the image VAE, native preprocessing, and independent image members. The experiments did not isolate which individual difference caused the improvement; a temporal dimension alone has not been established as the cause of those failures.
-
 ## Troubleshooting
 
 | Problem                               | Check                                                                                                                                                                            |
@@ -260,25 +230,15 @@ Earlier experiments produced duplicated women, mixed outfits, and character-shee
 | Small emblem differences              | Inspect source detail and encoding size. Identity consistency is not pixel-exact reproduction.                                                                                   |
 | Slow generation or high VRAM          | Check active reference count, latent sizes, other packs, and output resolution.                                                                                                  |
 
-For a fair comparison, keep checkpoint, VAE, prompt, seed, dimensions, steps, CFG, and Apply settings constant. Change one factor at a time.
-
 ## FAQ
 
 ### Is a RefMod a LoRA?
 
 No. It stores VAE reference latents rather than trained diffusion-weight changes.
 
-### Do I need an existing image to edit?
-
-No. Use text-to-image. The supplied pictures are references, not a required starting canvas.
-
 ### Can I keep several outfits in one file?
 
-Yes. The police and summer tests use the same asset and change the outfit phrase in the prompt.
-
-### Do I need to select an image index?
-
-No. The ordinary workflow loads and applies the complete pack.
+Yes. Add your images of the character in different outfits when creating the pack. Load the same pack for each generation and describe the desired outfit in the prompt.
 
 ### Does Qwen see the images inside it?
 
@@ -286,7 +246,7 @@ Not through this creator and ordinary Apply. The diffusion model receives the re
 
 ### Can I use character sheets?
 
-Yes; the demonstrated pack included them. A sheet remains one image containing several views. This does not guarantee that every sheet avoids layout transfer.
+Yes. Connect the sheet as an image input. It remains one reference containing several views; the creator does not split it into individual crops. Sheet composition can influence the generated layout.
 
 ### Can I rename a video RefMod to make it an image RefMod?
 
@@ -294,7 +254,7 @@ No. Renaming does not change its encoding. Recreate it with source images and th
 
 ### Are all seeds guaranteed to work?
 
-The shown seeds succeeded across two outfit prompts. Broader reliability depends on references, model, prompt, and settings.
+No. Results depend on the references, model, prompt, and generation settings.
 
 ## Reporting problems
 
@@ -315,6 +275,6 @@ Remove private information from shared workflows. For original loader/Apply beha
 - **[Luisa / Luisacaotica](https://github.com/Luisacaotica)** — [ComfyUI-MiniMaxH3Mod](https://github.com/Luisacaotica/ComfyUI-MiniMaxH3Mod), the inspiration and provider of the compatible classes and format. Read the original [README](https://github.com/Luisacaotica/ComfyUI-MiniMaxH3Mod#readme) and [license](https://github.com/Luisacaotica/ComfyUI-MiniMaxH3Mod/blob/main/LICENSE).
 - **[ComfyUI contributors](https://github.com/Comfy-Org/ComfyUI)** — native H3 Image support, VAE integration, reference preprocessing, and conditioning infrastructure.
 - **MiniMax** — the H3 model family.
-- **BExplains** — image-specific creation and the documented character/outfit tests.
+- **BExplains** — image-specific RefMod creation.
 
-This is a separate extension; attribution does not imply endorsement by the original author, ComfyUI, or MiniMax. The original project's license applies to its own code. Supply a separate license for this repository before public distribution.
+This is a separate extension; attribution does not imply endorsement by the original author, ComfyUI, or MiniMax. The original project's license applies to its own code. This extension is released under the [MIT License](LICENSE).
